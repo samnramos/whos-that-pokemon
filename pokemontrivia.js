@@ -1,5 +1,8 @@
 import express from "express";
-const app = express(); 
+const app = express();
+app.use(express.json());
+
+const games = {};
 
 app.get("/", (req, res) => {
     res.send("Pokemon Trivia"); 
@@ -35,16 +38,88 @@ app.get("/new", async (req, res) => {
             `Weight: ${pokemon.weight / 10} kg`
         ];
 
+        //Creates a game Id
+        const gameId = Date.now().toString();
+        //Stroes the correct answer/pokemon
+        games[gameId] = {
+            answer: pokemon.name.toLowerCase(), hints,
+            guesses: []
+        };
+
         // Send hints back to the player
         res.json({
+            gameId,
             hints
         });
+            } catch (error) {
+            res.status(500).json({
+                error: "Could not get Pokemon, Only enter Pokemon"
+             });
+            }
+        });
 
+//If-else statement is a Java Script statemnet, 
+//In this case it's when you put in the right answer you get the right output, 
+//but when you put in the wrong answer you get the other output or an error code message
 
-    } catch (error) {
-        res.status(500).json({
-            error: "Could not get Pokemon"
+//To guess the pokemon
+
+app.get("/guess/:gameId/:guess", (req,res) => {
+    const {gameId, guess} = req.params;
+    const game = games[gameId];
+    //When put the wrong id it gives the error code message
+    if (!game) {
+        return res.status(404).json ({
+            error: "Game not found :(." 
         });
     }
+    //Makes it lower case 
+    const normalizedGuess = guess.toLowerCase(); 
+    //To store a guess
+    game.guesses.push(normalizedGuess); 
+
+    if (normalizedGuess === game.answer) {
+        delete games[gameId]; //To end the game 
+        return res.json({
+            result: "correct",
+            message: `You got the right pokemon! It was ${game.answer}`
+        });
+    } else {
+        return res.json ({
+            result: "wrong",
+            message: "Try again or get another hint.",
+            guesses: game.guesses
+        })
+    }
 });
+
+//Gets more hints 
+
+app.get("/hint/:gameId", (req, res) => {
+    const {gameId} = req.params;
+     //When put the wrong id it gives the error code message
+    if (!game) {
+        return res.status(404).json ({
+            error: "Game not found" 
+        });
+
+        const nextHint = game.hints.shift(); 
+
+        if (!nextHint) {
+            return res.json ({
+                message: "No more hints :(."
+            });
+        }
+
+        res.json({
+            hint: nextHint
+        });
+    }
+
+
+});
+
+    app.listen(3000, () => {
+        console.log("app is running on 3000");
+    }); 
 
