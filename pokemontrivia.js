@@ -6,5 +6,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/new", (req, res) => {
-    // comment
+
 });
+
+app.listen(3000, () => {
+    console.log("app is running on 3000")
+});
+
