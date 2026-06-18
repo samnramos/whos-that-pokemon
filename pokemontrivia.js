@@ -70,7 +70,7 @@ app.get("/guess/:gameId/:guess", (req,res) => {
     const {gameId, guess} = req.params;
     const game = games[gameId];
     //When put the wrong id it gives the error code message
-    if (!game) {
+    if (!games[gameId]) {
         return res.status(404).json ({
             error: "Game not found :(." 
         });
@@ -98,28 +98,40 @@ app.get("/guess/:gameId/:guess", (req,res) => {
 //Gets more hints 
 
 app.get("/hint/:gameId", (req, res) => {
-    const {gameId} = req.params;
+    const { gameId } = req.params;
     const game = games[gameId];
-     //When put the wrong id it gives the error code message
+
     if (!game) {
-        return res.status(404).json ({
-            error: "Game not found" 
-        });
-
-        const nextHint = game.hints.shift(); 
-
-        if (!nextHint) {
-            return res.json ({
-                message: "No more hints :(."
-            });
-        }
-
-        res.json({
-            hint: nextHint
+        return res.status(404).json({
+            error: "Game not found"
         });
     }
 
+    const nextHint = game.hints.shift();
 
+    if (!nextHint) {
+        return res.json({
+            message: "No more hints :(."
+        });
+    }
+
+    res.json({
+        hint: nextHint
+    });
+});
+    app.get("/giveup/:gameId", (req,res) => {
+        const {gameId} = req.params;
+        const game= games[gameId]
+    //When put the wrong id it gives the error code message
+        if (!game) {
+            return res.status(404).json ({error: "Game not found :(." });
+        }
+        delete games[gameId]; //To end the game 
+        return res.json({
+            result: "Gave up? Better luck next time.",
+            message: `The pokemon was ${game.answer}`
+        
+    });
 });
 
     app.listen(3000, () => {
