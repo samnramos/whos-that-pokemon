@@ -42,14 +42,16 @@ app.get("/new", async (req, res) => {
         const gameId = Date.now().toString();
         //Stroes the correct answer/pokemon
         games[gameId] = {
-            answer: pokemon.name.toLowerCase(), hints,
+            answer: pokemon.name.toLowerCase(), 
+            hints,
             guesses: []
         };
 
         // Send hints back to the player
+        const firstHint = hints.shift(); // Get the first hint
         res.json({
             gameId,
-            hints
+            hint: firstHint
         });
             } catch (error) {
             res.status(500).json({
@@ -97,6 +99,7 @@ app.get("/guess/:gameId/:guess", (req,res) => {
 
 app.get("/hint/:gameId", (req, res) => {
     const {gameId} = req.params;
+    const game = games[gameId];
      //When put the wrong id it gives the error code message
     if (!game) {
         return res.status(404).json ({
