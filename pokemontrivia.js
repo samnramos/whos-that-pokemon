@@ -1,12 +1,9 @@
 import express from "express";
 const app = express();
 app.use(express.json());
+app.use(express.static("public"))
 
 const games = {};
-
-app.get("/", (req, res) => {
-    res.send("Pokemon Trivia"); 
-});
 
 app.get("/new", async (req, res) => {
     try {
