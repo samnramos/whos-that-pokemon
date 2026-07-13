@@ -48,7 +48,8 @@ app.get("/new", async (req, res) => {
         const firstHint = hints.shift(); // Get the first hint
         res.json({
             gameId,
-            hint: firstHint
+            hint: firstHint,
+            hintsLeft: hints.length
         });
             } catch (error) {
             res.status(500).json({
@@ -108,12 +109,14 @@ app.get("/hint/:gameId", (req, res) => {
 
     if (!nextHint) {
         return res.json({
-            message: "No more hints :(."
+            message: "No more hints :(.",
+            hintsLeft: 0
         });
     }
 
     res.json({
-        hint: nextHint
+        hint: nextHint,
+        hintsLeft: game.hints.length
     });
 });
     app.get("/giveup/:gameId", (req,res) => {

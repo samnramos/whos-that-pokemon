@@ -1,65 +1,137 @@
-app.get("/", (req, res) => {
-    res.send(`
-    <html>
+<!DOCTYPE html>
+<html>
     <head>
-        <title>Pokemon Trivia</title>
+        <title>
+            Pokemon Trivia
+        </title>
 
         <style>
-        body {
-            text-align: center;
-            background: linear-gradient(
-                to bottom,
-                #ff0000 50%,
-                #ffffff 50%
-                );
-                font-family: "Times New Roman", serif;
-                color: #000000;
-                margin-top: 100px;
-        }
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
 
-            h1 {
-                font-size: 80px;
+                min-height: 100vh;
+                margin: 0;
+
+                font-family: Arial, sans-serf;
+                text-align: center;
+            }
+
+            input {
+                padding: 10px;
+                width: 250px;
+                margin: 10px;
             }
 
             button {
-                font-size: 24px;
-                padding: 15px 40px; 
-                background-color: #ffdd00; 
-                color: #003cff; 
-                border: none;
-                border-radius: 10px;
+                padding: 10px 15px;
                 cursor: pointer;
             }
 
-            button:hover {
-                background-color: #ffd000; 
+            #hint
+            #result,
+            #hintsLeft {
+                font-size: 18px;
+                margin: 10px;
             }
         </style>
     </head>
 
     <body>
-        <h1>Who's that Pokémon?</h1>
+        <h1>
+            Pokemon Trivia
+        </h1>
 
-        <button onclick="startGame()">
-            Play
+        <p id = "hint">
+            Start Game!
+        </p>
+
+        <p id = "hintsLeft">
+            Hints Left: 0
+        </p>
+
+        <input id = "guessBox" type = "Text" placeholder = "Guess that Pokemon">
+
+        <div class = "button-container">
+        <button onclick = "submitGuess()"> 
+            Guess
         </button>
+        <button onclick = "getHint()"> 
+            Get Hint
+        </button>
+        <button onclick = "startGame()">
+            New Game
+        </button>
+        <button onclick = "giveUp()">
+            Give Up
+        </button>
+        </div>
 
-        <p id="hint"></p>
+        <p id = "result">
+        </p>
 
         <script>
             let gameId = null;
+            async function startGame() {
+                const response = await fetch("/new");
+                const data = await response.json();
 
-            function startGame() {
-                fetch("/new")
-                .then(res => res.json())
-                .then(data => {
-                    gameId = data.gameId;
-                    document.getElementById("hint").innerText = data.hint;
-                });
+                console.log(data);
+
+                gameId = data.gameId;
+
+                document.getElementById("hint").textContent = "Hint: " + data.hint;
+                document.getElementById("hintsLeft").textContent = "Hints Left: " + data.hintsLeft;
+                document.getElementById("result").textContent = "";
+                document.getElementById("guessBox").value = "";
+
             }
+
+            async function submitGuess() {
+                if (!gameId) {
+                    alert("Start a game first!")
+                    return;
+                }
+
+                const guess = document.getElementById("guessBox").value;
+                const response = await fetch(`/guess/${gameId}/${guess}`)
+                const data = await response.json();
+                
+                document.getElementById("result").textContent = data.message;
+            }
+
+
+                async function getHint() {
+                    if (!gameId) {
+                        alert("Start a game first!");
+                        return;
+                    }
+
+                    const response = await fetch (`/hint/${gameId}`);
+                    const data = await response.json();
+
+                    if (data.hint) {
+                        document.getElementById("hint").textContent = "Hint: " + data.hint;
+                        document.getElementById("hintsLeft").textContent = "Hints Left: " + data.hintsLeft;
+                    } else {
+                        document.getElementById("hint").textContent = data.message;
+                        document.getElementById("hintsLeft").textContent = "Hints Left: 0";
+                    }
+
+                    async function giveUp() {
+                        const response = await fetch(`/giveup/${gameId}`);
+                        const data = await response.json();
+
+                        document.getElementById("result").textContent = data.message;
+                        
+                        gameId = null;
+                    }
+                }
+
+                startGame();
         </script>
     </body>
-    </html>
-    `);
-});
+</html>
 
