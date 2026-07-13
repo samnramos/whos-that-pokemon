@@ -121,8 +121,10 @@ app.get("/hint/:gameId", (req, res) => {
         const game= games[gameId]
     //When put the wrong id it gives the error code message
         if (!game) {
-            return res.status(404).json ({error: "Game not found :(." });
+            return res.status(404).json ({error: "Game not found." 
+            });
         }
+
         delete games[gameId]; //To end the game 
         return res.json({
             result: "Gave up? Better luck next time.",
