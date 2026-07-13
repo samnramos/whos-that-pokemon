@@ -47,7 +47,7 @@ http://localhost:3000
 2. The game gives you a hint and how many you have left
 3. If you need more hints press "Get Hint"
 4. If you want to start a new game press "New Game"
-5. If you give up press "Gie up" to get the pokemon
+5. If you give up press "Give up" to get the pokemon
 
 ----Game Start for Browser----
 
