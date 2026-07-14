@@ -3,7 +3,6 @@
 ## Prerequisites
 
 - **Node 22+** and **Yarn 4** (via Corepack: `corepack enable`)
-- **ngrok** (only needed to play together across machines)
 
 ### Node version (nvm)
 
