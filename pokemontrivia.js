@@ -41,15 +41,26 @@ app.get("/new", async (req, res) => {
         games[gameId] = {
             answer: pokemon.name.toLowerCase(), 
             hints,
-            guesses: []
+            guesses: [],
+            hintsUsed: 0,
+            pokemon: {
+                type: pokemon.types.map(t => t.type.name).join(", "),
+                move: randomMove,
+                generation: generation,
+                foundIn: species.habitat?.name ?? "unknown",
+                weight: `${pokemon.weight / 10} kg`}
         };
+
+        console.log("Created Game:");
+        console.log(games[gameId]);
+
 
         // Send hints back to the player
         const firstHint = hints.shift(); // Get the first hint
         res.json({
             gameId,
-            hint: firstHint,
-            hintsLeft: hints.length
+            hint: "Choose a hint category!",
+            hintsLeft: 5
         });
             } catch (error) {
             res.status(500).json({
@@ -79,10 +90,20 @@ app.get("/guess/:gameId/:guess", (req,res) => {
     game.guesses.push(normalizedGuess); 
 
     if (normalizedGuess === game.answer) {
+        const wrongGuesses = game.guesses.length -1;
+
+        let score = 100;
+        score -= game.hintsUsed * 10;
+        score -= wrongGuesses * 5;
+
+        if (score < 0) {
+            score = 0;
+        }
+
         delete games[gameId]; //To end the game 
         return res.json({
             result: "correct",
-            message: `You got the right pokemon! It was ${game.answer}`
+            message: `You got the right pokemon! It was ${game.answer}. Score: ${score}`
         });
     } else {
         return res.json ({
@@ -119,6 +140,72 @@ app.get("/hint/:gameId", (req, res) => {
         hintsLeft: game.hints.length
     });
 });
+
+app.get("/hint/:gameId/:category", (req, res) => {
+    const {gameId, category} = req.params;
+    const game = games[gameId];
+
+    console.log("Category:", category);
+    console.log("Game:", game);
+
+    if (!game) {
+        return res.status(404).json({
+            message: "Game not found"
+        });
+    }
+
+    game.hintsUsed++;
+
+    const hintsLeft = Math.max(0, 5 - game.hintsUsed);
+
+    switch (category) {
+        case "type":
+            console.log({
+                hint: game.pokemon.type,
+                hintsLeft});
+            return res.json({
+                hint: game.pokemon.type,
+                hintsLeft
+            });
+        case "move":
+            console.log({
+                hint: game.pokemon.move,
+                hintsLeft});
+            return res.json({
+                hint: game.pokemon.move,
+                hintsLeft
+            });
+        case "generation":
+            console.log({
+                hint: game.pokemon.generation,
+                hintsLeft});
+            return res.json({
+                hint: game.pokemon.generation,
+                hintsLeft
+            });
+        case "foundin":
+            console.log({
+                hint: game.pokemon.foundIn,
+                hintsLeft});
+                return res.json({
+                    hint: game.pokemon.foundIn,
+                    hintsLeft
+            });
+        case "weight":
+            console.log({
+                hint: game.pokemon.weight,
+                hintsLeft});
+                return res.json({
+                    hint: game.pokemon.weight,
+                    hintsLeft
+            });
+        default:
+            return res.status(400).json({
+                message: "Invalid hint category"
+            });
+        }
+});
+
     app.get("/giveup/:gameId", (req,res) => {
         const {gameId} = req.params;
         const game= games[gameId]
