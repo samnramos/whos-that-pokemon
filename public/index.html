@@ -15,8 +15,29 @@
                 min-height: 100vh;
                 margin: 0;
 
-                font-family: Arial, sans-serf;
+                font-family: Arial, sans-serif;
                 text-align: center;
+
+                background: White;
+                color: Black;
+                transition: all 0.5s ease;
+            }
+
+            .dark-mode {
+                background: black;
+                color: White;
+            }
+
+            .dark-mode input {
+                background-color: #222; 
+                color: White; 
+                border: 1px solid white;
+            }
+
+            .dark-mode button {
+                background-color: #333;
+                color: White;
+                border: 1px solid white;
             }
 
             input {
@@ -30,7 +51,18 @@
                 cursor: pointer;
             }
 
-            #hint
+            #themeButton {
+                position: fixed;
+                top: 15px;
+                right: 15px;
+
+                padding: 10px 15px;
+                border-radius: 8px;
+
+                z-index: 1000;
+            }
+
+            #hint,
             #result,
             #hintsLeft {
                 font-size: 18px;
@@ -40,6 +72,10 @@
     </head>
 
     <body>
+        <button id = "themeButton" 
+        onclick = "toggleTheme()">
+            Dark Mode
+        </button>
         <h1>
             Pokemon Trivia
         </h1>
@@ -119,14 +155,28 @@
                         document.getElementById("hint").textContent = data.message;
                         document.getElementById("hintsLeft").textContent = "Hints Left: 0";
                     }
+                }
 
-                    async function giveUp() {
+                async function giveUp() {
                         const response = await fetch(`/giveup/${gameId}`);
                         const data = await response.json();
 
                         document.getElementById("result").textContent = data.message;
                         
                         gameId = null;
+                }
+
+                function toggleTheme() {
+                    document.body.classList.toggle("dark-mode");
+
+                    console.log(document.body.className);
+
+                    const button = document.getElementById("themeButton");
+
+                    if (document.body.classList.contains("dark-mode")) {
+                        button.textContent = "Light Mode";
+                    } else {
+                        button.textContent = "Dark Mode";
                     }
                 }
 
