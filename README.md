@@ -46,7 +46,7 @@ After running `node pokemontrivia.js` in the root terminal:
 
 1. Copy the localhost link into the browser.
 2. Guess the pokemon based on the hint that was given when you run.
-3. Click get hint for more hints reminder you only have 4 hints.
+3. Click get hint for more hints reminder you only have 5 hints.
 4. If you give up press give up for the pokemon name.
 
 ## How to play
