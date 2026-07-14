@@ -21,6 +21,7 @@ Run these commands from the project root:
 
 ```bash
 cd whos-that-pokemon
+git clone https://github.com/samnramos/whos-that-pokemon.git
 yarn install
 ```
 
