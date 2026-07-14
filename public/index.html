@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
     <head>
         <title>
@@ -51,6 +50,17 @@
                 cursor: pointer;
             }
 
+            .hint-panel {
+                position: fixed;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+
+                display: flex;
+                flex-direction: column;
+                gap: 10px
+            }
+
             #themeButton {
                 position: fixed;
                 top: 15px;
@@ -89,13 +99,28 @@
         </p>
 
         <input id = "guessBox" type = "Text" placeholder = "Guess that Pokemon">
+        
+        <div class = "hint-panel">
+        <button onclick = "getHint('type')"> 
+            Type Hint
+        </button>
+         <button onclick = "getHint('move')"> 
+            Move Hint
+        </button>
+         <button onclick = "getHint('generation')"> 
+            Generation Hint
+        </button>
+         <button onclick = "getHint('foundin')"> 
+            Found In Hint
+        </button>
+         <button onclick = "getHint('weight')"> 
+            Weight Hint
+        </button>
+        </div>
 
         <div class = "button-container">
         <button onclick = "submitGuess()"> 
             Guess
-        </button>
-        <button onclick = "getHint()"> 
-            Get Hint
         </button>
         <button onclick = "startGame()">
             New Game
@@ -119,7 +144,7 @@
                 gameId = data.gameId;
 
                 document.getElementById("hint").textContent = "Hint: " + data.hint;
-                document.getElementById("hintsLeft").textContent = "Hints Left: " + data.hintsLeft;
+                document.getElementById("hintsLeft").textContent = `Hints Left: ${data.hintsLeft}`;
                 document.getElementById("result").textContent = "";
                 document.getElementById("guessBox").value = "";
 
@@ -139,18 +164,24 @@
             }
 
 
-                async function getHint() {
+                async function getHint(category) {
+                    console.log("Category:", category);
+                    console.log("Game ID:", gameId);
+
                     if (!gameId) {
                         alert("Start a game first!");
                         return;
                     }
 
-                    const response = await fetch (`/hint/${gameId}`);
+                    const response = await fetch (`/hint/${gameId}/${category}`);
+                    console.log("Response status:", response.status);
+
                     const data = await response.json();
+                    console.log(data);
 
                     if (data.hint) {
-                        document.getElementById("hint").textContent = "Hint: " + data.hint;
-                        document.getElementById("hintsLeft").textContent = "Hints Left: " + data.hintsLeft;
+                        document.getElementById("hint").textContent = `${category.toUpperCase()} Hints: ${data.hint}`;                        
+                        document.getElementById("hintsLeft").textContent = `Hints Left: ${data.hintsLeft}`;
                     } else {
                         document.getElementById("hint").textContent = data.message;
                         document.getElementById("hintsLeft").textContent = "Hints Left: 0";
