@@ -218,7 +218,7 @@
             let Wins = 0;
             let Losses = 0;
             let score = 0;
-            let totslScore = 0;
+            let totalScore = 0;
 
             async function startGame() {
                 const response = await fetch("/new");
@@ -247,14 +247,16 @@
                 
                 document.getElementById("result").textContent = data.message;
 
-                if (data.result === "Correct") {
+                if (data.result === "correct") {
                     Wins++;
                     score = data.score;
+                    totalScore += data.score;
+
                     updateScoreboard();
                     gameId = null;
                 }
 
-                if (data.message.toLowerCase().includes("Correct")) {
+                if (data.message.toLowerCase().includes("correct")) {
                     
                     Wins ++;
                     updateScoreboard();
