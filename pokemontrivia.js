@@ -103,6 +103,7 @@ app.get("/guess/:gameId/:guess", (req,res) => {
         delete games[gameId]; //To end the game 
         return res.json({
             result: "correct",
+            Score: Score,
             message: `You got the right pokemon! It was ${game.answer}. Score: ${score}`
         });
     } else {
