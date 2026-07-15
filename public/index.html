@@ -7,19 +7,27 @@
         <style>
             body {
                 display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-
                 min-height: 100vh;
                 margin: 0;
 
                 font-family: Arial, sans-serif;
-                text-align: center;
-
                 background: White;
                 color: Black;
-                transition: all 0.5s ease;
+            }
+
+            .sidebar {
+                width: 450px;
+                padding: 20px;
+
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+
+                border-right: 2px solid black;
+            }
+
+            .dark-mode .sidebar {
+                border-right: 2px solid white;
             }
 
             .dark-mode {
@@ -50,15 +58,46 @@
                 cursor: pointer;
             }
 
+            .scoreboard {
+                border: 2px solid black;
+                border-radius: 10px;
+                padding: 15px;
+                text-align: left;
+            }
+
+            .dark-mode .scoreboard {
+                background: black;
+                color: white;
+                border-color: white;
+            }
+
             .hint-panel {
-                position: fixed;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%);
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                justify-items: center;
+            }
+
+            .hint-panel h3 {
+                grid-column: 1 / -1;
+                text-align: center;
+            }
+
+            .hint-panel button {
+                width: 140px;
+            }
+
+            .weight-btn {
+                grid-column: 1 / -1;
+                justify-self: center;
+            }
+
+            .game-area {
+                flex: 1;
 
                 display: flex;
                 flex-direction: column;
-                gap: 10px
+                justify-content: center;
+                align-items: center;
             }
 
             #themeButton {
@@ -86,21 +125,46 @@
         onclick = "toggleTheme()">
             Dark Mode
         </button>
-        <h1>
-            Pokemon Trivia
-        </h1>
 
-        <p id = "hint">
-            Start Game!
+        <div class = "sidebar">
+        <div class = "scoreboard">
+            <h3>
+                Scoreboard
+            </h3>
+            <p> 
+                Wins:
+                 <span id = "Wins"> 
+                    0 
+                </span> 
+            </p>
+            <p>
+                Losses: 
+                <span id = "Losses"> 
+                    0 
+            </span>
         </p>
-
-        <p id = "hintsLeft">
-            Hints Left: 0
+        <p> 
+            Games Played:
+             <span id = "gamesPlayed"> 
+                0 
+            </span>
         </p>
+        <p> 
+            Current Score: 
+            <span id = "Score"> 
+                0 
+            </span>
+        </p>
+        <p> 
+            Total Points: 
+            <span id = "totalScore"> 
+                0 
+            </span>
+        </p>
+        </div>
 
-        <input id = "guessBox" type = "Text" placeholder = "Guess that Pokemon">
-        
-        <div class = "hint-panel">
+         <div class = "hint-panel">
+            <h3> Hints </h3>
         <button onclick = "getHint('type')"> 
             Type Hint
         </button>
@@ -117,6 +181,21 @@
             Weight Hint
         </button>
         </div>
+        </div>
+        <div class = "game-area">
+        <h1>
+            Pokemon Trivia
+        </h1>
+
+        <p id = "hint">
+            Start Game!
+        </p>
+
+        <p id = "hintsLeft">
+            Hints Left: 0
+        </p>
+
+        <input id = "guessBox" type = "Text" placeholder = "Guess that Pokemon">
 
         <div class = "button-container">
         <button onclick = "submitGuess()"> 
@@ -132,9 +211,15 @@
 
         <p id = "result">
         </p>
-
+        </div>
         <script>
             let gameId = null;
+
+            let Wins = 0;
+            let Losses = 0;
+            let score = 0;
+            let totslScore = 0;
+
             async function startGame() {
                 const response = await fetch("/new");
                 const data = await response.json();
@@ -161,6 +246,22 @@
                 const data = await response.json();
                 
                 document.getElementById("result").textContent = data.message;
+
+                if (data.result === "Correct") {
+                    Wins++;
+                    score = data.score;
+                    updateScoreboard();
+                    gameId = null;
+                }
+
+                if (data.message.toLowerCase().includes("Correct")) {
+                    
+                    Wins ++;
+                    updateScoreboard();
+                    totalScore += data.score;
+                    
+                    gameId = null;
+                }
             }
 
 
@@ -193,6 +294,11 @@
                         const data = await response.json();
 
                         document.getElementById("result").textContent = data.message;
+
+                        Losses++;
+                        Score = 0;
+
+                        updateScoreboard();
                         
                         gameId = null;
                 }
@@ -209,6 +315,14 @@
                     } else {
                         button.textContent = "Dark Mode";
                     }
+                }
+
+                function updateScoreboard() {
+                    document.getElementById("Wins").textContent = Wins;
+                    document.getElementById("Losses").textContent = Losses;
+                    document.getElementById("gamesPlayed").textContent = Wins + Losses;
+                    document.getElementById("Score").textContent = score;
+                    document.getElementById("totalScore").textContent = totslScore;
                 }
 
                 startGame();
